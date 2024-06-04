@@ -41,6 +41,39 @@ docker exec -it postgres16 bash -c "psql -U root"
 ```
 使用 `golang` 插件连接数据库，测试连接。或者， 使用 [datagrip](https://www.jetbrains.com/datagrip/) 图形化界面，连接数据库。
 
-### 3.使用[【https://dbdiagram.io/】](https://dbdiagram.io/)创建数据表
+```bash 
+# 停止容器 postgres16
+docker stop postgres16
+# 查看正在运行的容器
+docker ps
+# 查看所有容器
+docker ps -a
+# 启动容器 postgres16
+docker start postgres16
+
+# 删除容器
+docker rm postgres16
+```
+## 2.数据库相关
+### 1.使用[【https://dbdiagram.io/】](https://dbdiagram.io/)创建数据表
 
 <iframe width="560" height="315" src='https://dbdiagram.io/e/665dba85b65d9338795d2fed/665ed607b65d9338797298a5'> </iframe>
+
+### 2.使用[【golang-migrate】](https://github.com/golang-migrate/migrate)管理数据版本及迁移
+
+查看 `migrate cli` 可用命令： 
+```bash
+migrate -help
+      goto V       Migrate to version V
+      up [N]       Apply all or N up migrations
+      down [N] [-all]    Apply all or N down migrations
+            Use -all to apply all down migrations
+      drop [-f]    Drop everything inside database
+            Use -f to bypass confirmation
+      force V      Set version V but don't run migration (ignores dirty state)
+      version      Print current migration version
+```
+
+```bash
+migrate create -ext sql -dir db/migration -seq init_schema
+```
