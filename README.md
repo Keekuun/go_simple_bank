@@ -168,3 +168,12 @@ sql:
       package: "authors"
       out: "mysql"
 ```
+
+## 3.项目相关
+
+### 1.初始化
+```bash
+go mod init github.com/Keekuun/go_simple_bank
+
+go mod tidy
+```
