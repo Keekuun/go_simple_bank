@@ -15,12 +15,7 @@ FROM transfers
 ORDER BY id
 LIMIT $1 OFFSET $2;
 
--- name: UpdateTransfer :exec
-UPDATE transfers
-SET amount = $1
-WHERE id = $2;
-
--- name: UpdateTransferWithReturn :one
+-- name: UpdateTransfer :one
 UPDATE transfers
 SET amount = $1
 WHERE id = $2

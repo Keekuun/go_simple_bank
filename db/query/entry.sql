@@ -15,12 +15,7 @@ FROM entries
 ORDER BY id
 LIMIT $1 OFFSET $2;
 
--- name: UpdateEntry :exec
-UPDATE entries
-SET amount = $1
-WHERE id = $2;
-
--- name: UpdateEntryWithReturn :one
+-- name: UpdateEntry :one
 UPDATE entries
 SET amount = $1
 WHERE id = $2

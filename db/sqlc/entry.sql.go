@@ -118,10 +118,11 @@ func (q *Queries) GetEntryList(ctx context.Context, arg GetEntryListParams) ([]E
 	return items, nil
 }
 
-const updateEntry = `-- name: UpdateEntry :exec
+const updateEntry = `-- name: UpdateEntry :one
 UPDATE entries
 SET amount = $1
 WHERE id = $2
+RETURNING id, account_id, amount, created_at
 `
 
 type UpdateEntryParams struct {
@@ -129,25 +130,8 @@ type UpdateEntryParams struct {
 	ID     int64 `json:"id"`
 }
 
-func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) error {
-	_, err := q.db.ExecContext(ctx, updateEntry, arg.Amount, arg.ID)
-	return err
-}
-
-const updateEntryWithReturn = `-- name: UpdateEntryWithReturn :one
-UPDATE entries
-SET amount = $1
-WHERE id = $2
-RETURNING id, account_id, amount, created_at
-`
-
-type UpdateEntryWithReturnParams struct {
-	Amount int64 `json:"amount"`
-	ID     int64 `json:"id"`
-}
-
-func (q *Queries) UpdateEntryWithReturn(ctx context.Context, arg UpdateEntryWithReturnParams) (Entry, error) {
-	row := q.db.QueryRowContext(ctx, updateEntryWithReturn, arg.Amount, arg.ID)
+func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) (Entry, error) {
+	row := q.db.QueryRowContext(ctx, updateEntry, arg.Amount, arg.ID)
 	var i Entry
 	err := row.Scan(
 		&i.ID,

@@ -15,12 +15,7 @@ FROM accounts
 ORDER BY id
 LIMIT $1 OFFSET $2;
 
--- name: UpdateAccount :exec
-UPDATE accounts
-SET balance = $1
-WHERE id = $2;
-
--- name: UpdateAccountWithReturn :one
+-- name: UpdateAccount :one
 UPDATE accounts
 SET balance = $1
 WHERE id = $2
