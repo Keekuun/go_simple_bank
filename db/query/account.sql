@@ -25,3 +25,8 @@ UPDATE accounts
 SET balance = $1
 WHERE id = $2
 RETURNING *;
+
+-- name: DeleteAccount :exec
+DELETE
+FROM accounts
+where id = $1;
