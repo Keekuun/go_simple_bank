@@ -33,3 +33,80 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (A
 	)
 	return i, err
 }
+
+const getAccount = `-- name: GetAccount :many
+SELECT id, owner, balance, currency, created_at
+FROM accounts
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetAccount(ctx context.Context, id int64) ([]Account, error) {
+	rows, err := q.db.QueryContext(ctx, getAccount, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Account
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.Owner,
+			&i.Balance,
+			&i.Currency,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAccountList = `-- name: GetAccountList :many
+SELECT id, owner, balance, currency, created_at
+FROM accounts
+ORDER BY id
+LIMIT $1 OFFSET $2
+`
+
+type GetAccountListParams struct {
+	Limit  int64 `json:"limit"`
+	Offset int64 `json:"offset"`
+}
+
+func (q *Queries) GetAccountList(ctx context.Context, arg GetAccountListParams) ([]Account, error) {
+	rows, err := q.db.QueryContext(ctx, getAccountList, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Account
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.Owner,
+			&i.Balance,
+			&i.Currency,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
