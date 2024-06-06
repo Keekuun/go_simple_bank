@@ -12,16 +12,6 @@ LIMIT 1;
 -- name: GetEntryList :many
 SELECT *
 FROM entries
+WHERE account_id = $1
 ORDER BY id
-LIMIT $1 OFFSET $2;
-
--- name: UpdateEntry :one
-UPDATE entries
-SET amount = $1
-WHERE id = $2
-RETURNING *;
-
--- name: DeleteEntry :exec
-DELETE
-FROM entries
-where id = $1;
+LIMIT $2 OFFSET $3;

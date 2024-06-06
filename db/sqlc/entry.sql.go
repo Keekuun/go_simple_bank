@@ -3,7 +3,7 @@
 //   sqlc v1.26.0
 // source: entry.sql
 
-package sqlc
+package db
 
 import (
 	"context"
@@ -30,17 +30,6 @@ func (q *Queries) CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry
 		&i.CreatedAt,
 	)
 	return i, err
-}
-
-const deleteEntry = `-- name: DeleteEntry :exec
-DELETE
-FROM entries
-where id = $1
-`
-
-func (q *Queries) DeleteEntry(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteEntry, id)
-	return err
 }
 
 const getEntry = `-- name: GetEntry :many
@@ -81,17 +70,19 @@ func (q *Queries) GetEntry(ctx context.Context, id int64) ([]Entry, error) {
 const getEntryList = `-- name: GetEntryList :many
 SELECT id, account_id, amount, created_at
 FROM entries
+WHERE account_id = $1
 ORDER BY id
-LIMIT $1 OFFSET $2
+LIMIT $2 OFFSET $3
 `
 
 type GetEntryListParams struct {
-	Limit  int64 `json:"limit"`
-	Offset int64 `json:"offset"`
+	AccountID int64 `json:"accountId"`
+	Limit     int64 `json:"limit"`
+	Offset    int64 `json:"offset"`
 }
 
 func (q *Queries) GetEntryList(ctx context.Context, arg GetEntryListParams) ([]Entry, error) {
-	rows, err := q.db.QueryContext(ctx, getEntryList, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, getEntryList, arg.AccountID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -116,28 +107,4 @@ func (q *Queries) GetEntryList(ctx context.Context, arg GetEntryListParams) ([]E
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateEntry = `-- name: UpdateEntry :one
-UPDATE entries
-SET amount = $1
-WHERE id = $2
-RETURNING id, account_id, amount, created_at
-`
-
-type UpdateEntryParams struct {
-	Amount int64 `json:"amount"`
-	ID     int64 `json:"id"`
-}
-
-func (q *Queries) UpdateEntry(ctx context.Context, arg UpdateEntryParams) (Entry, error) {
-	row := q.db.QueryRowContext(ctx, updateEntry, arg.Amount, arg.ID)
-	var i Entry
-	err := row.Scan(
-		&i.ID,
-		&i.AccountID,
-		&i.Amount,
-		&i.CreatedAt,
-	)
-	return i, err
 }
