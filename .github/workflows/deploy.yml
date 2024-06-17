@@ -45,8 +45,14 @@ jobs:
         # 唯一标识符, 后续步骤可以引用该步骤的输出或者状态
         id: go
 
+      - name: Install golang-migrate
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xvz
+          mv migrate.linux-amd64.tar.gz /usr/bin
+          which migrate
       - name: Run migrations
         run: make migrateUp
+
       - name: Build
         run: go build -v ./...
 
