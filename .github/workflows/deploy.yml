@@ -46,7 +46,7 @@ jobs:
         id: go
 
       - name: Run migrations
-        run: make migrationUp
+        run: make migrateUp
       - name: Build
         run: go build -v ./...
 
