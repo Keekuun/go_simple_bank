@@ -24,4 +24,9 @@ migrateDown:
 
 sqlc:
 	sqlc generate
-.PHONY: postgres createDB dropDB migrateUp migrateDown sqlc
+
+# ./... 在当前目录及其子目录中运行所有包的测试
+test:
+	go test -v -cover ./...
+
+.PHONY: postgres createDB dropDB migrateUp migrateDown sqlc test
