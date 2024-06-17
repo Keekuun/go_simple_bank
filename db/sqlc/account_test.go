@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"github.com/Keekuun/go_simple_bank/util"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -65,4 +66,16 @@ func TestUpdateAccount(t *testing.T) {
 	require.Equal(t, arg.Balance, account2.Balance)
 	require.Equal(t, account1.Currency, account2.Currency)
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
+}
+
+func TestQueries_DeleteAccount(t *testing.T) {
+	account1 := createRandomAccount(t)
+
+	err1 := testQueries.DeleteAccount(context.Background(), account1.ID)
+	require.NoError(t, err1)
+
+	account2, err2 := testQueries.GetAccount(context.Background(), account1.ID)
+	require.Error(t, err2)
+	require.EqualError(t, err2, sql.ErrNoRows.Error())
+	require.Empty(t, account2)
 }
