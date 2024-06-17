@@ -177,3 +177,5 @@ go mod init github.com/Keekuun/go_simple_bank
 
 go mod tidy
 ```
+
+> learn from: [https://github.com/techschool/simplebank](https://github.com/techschool/simplebank)
