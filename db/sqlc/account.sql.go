@@ -45,40 +45,24 @@ func (q *Queries) DeleteAccount(ctx context.Context, id int64) error {
 	return err
 }
 
-const getAccount = `-- name: GetAccount :many
+const getAccount = `-- name: GetAccount :one
 SELECT id, owner, balance, currency, created_at
 FROM accounts
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetAccount(ctx context.Context, id int64) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, getAccount, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Account
-	for rows.Next() {
-		var i Account
-		if err := rows.Scan(
-			&i.ID,
-			&i.Owner,
-			&i.Balance,
-			&i.Currency,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetAccount(ctx context.Context, id int64) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccount, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Balance,
+		&i.Currency,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getAccountList = `-- name: GetAccountList :many

@@ -29,7 +29,7 @@ func RandomString(n int) string {
 
 // RandomOwner 生成随机 用户名
 func RandomOwner() string {
-	return RandomString(8)
+	return RandomString(int(RandomInt(4, 8)))
 }
 
 // RandomMoney 生成随机 金额
