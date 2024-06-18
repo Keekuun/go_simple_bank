@@ -34,40 +34,24 @@ func (q *Queries) CreateTransfer(ctx context.Context, arg CreateTransferParams) 
 	return i, err
 }
 
-const getTransfer = `-- name: GetTransfer :many
+const getTransfer = `-- name: GetTransfer :one
 SELECT id, from_account_id, to_account_id, amount, created_at
 FROM transfers
 WHERE id = $1
 LIMIT 1
 `
 
-func (q *Queries) GetTransfer(ctx context.Context, id int64) ([]Transfer, error) {
-	rows, err := q.db.QueryContext(ctx, getTransfer, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Transfer
-	for rows.Next() {
-		var i Transfer
-		if err := rows.Scan(
-			&i.ID,
-			&i.FromAccountID,
-			&i.ToAccountID,
-			&i.Amount,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetTransfer(ctx context.Context, id int64) (Transfer, error) {
+	row := q.db.QueryRowContext(ctx, getTransfer, id)
+	var i Transfer
+	err := row.Scan(
+		&i.ID,
+		&i.FromAccountID,
+		&i.ToAccountID,
+		&i.Amount,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getTransferList = `-- name: GetTransferList :many
